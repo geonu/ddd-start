@@ -7,27 +7,34 @@ from .product import Product
 
 class Order():
     def __init__(
-            self, order_lines: List[OrderLine], state: OrderState = None,
-            shipping_info: ShippingInfo = None,
+            self, order_lines: List[OrderLine], shipping_info: ShippingInfo,
+            state: OrderState = None,
             ) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
 
         self.validate_order_lines(order_lines)
+        self.validate_shipping_info(shipping_info)
 
         self.order_lines = order_lines
-        self.state = state
         self.shipping_info = shipping_info
+        self.state = state
 
-    def validate_order_lines(self, order_lines) -> None:
+    def validate_order_lines(self, order_lines: List[OrderLine]) -> None:
         if len(order_lines) == 0:
             raise ValueError('Order must have more than one OrderLine')
+
+    def validate_shipping_info(self, shipping_info: ShippingInfo) -> None:
+        if shipping_info is None:
+            raise ValueError('Order must have not None ShippingInfo')
 
     @property
     def total_amount(self) -> int:
         return sum(line.amount for line in self.order_lines)
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
+        self.validate_shipping_info(shipping_info)
+
         if not self.state.can_change_shipping_info():
             raise ValueError(
                     f'cannot change shipping info in {self.state} order state')

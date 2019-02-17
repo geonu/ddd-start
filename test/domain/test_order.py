@@ -7,19 +7,27 @@ from domain.product import Product
 class TestOrderValidateOrderLines():
     def test_validate_order_lines(self):
         order_lines = []
+        shipping_info: ShippingInfo = create_shipping_info_helper()
 
         with pytest.raises(ValueError):
-            Order(order_lines)
+            Order(order_lines, shipping_info)
+
+
+class TestOrderValidateShippingInfo():
+    def test_validate_shipping_info(self):
+        order_line: OrderLine = create_order_line_helper()
+
+        with pytest.raises(ValueError):
+            Order([order_line], None)
 
 
 class TestOrderTotalAmount():
     def test_total_amount(self):
-        price = 5000
-        product = Product(price)
-        quantity = 3
-        order_lines = [OrderLine(product, quantity),
-                       OrderLine(product, quantity)]
-        order = Order(order_lines)
+        order_line_1: OrderLine = create_order_line_helper()
+        order_line_2: OrderLine = create_order_line_helper()
+        order_lines = [order_line_1, order_line_2]
+        shipping_info: ShippingInfo = create_shipping_info_helper()
+        order = Order(order_lines, shipping_info)
 
         total_amount: int = order.total_amount
 
@@ -28,14 +36,13 @@ class TestOrderTotalAmount():
 
 class TestOrderChangeShippingInfo():
     def test_change_shipping_info(self):
-        price = 5000
-        product = Product(price)
-        quantity = 3
-        order_lines = [OrderLine(product, quantity)]
-        order = Order(order_lines)
-        name = 'my name'
-        phone_number = '01012341234'
-        address = 'my address'
+        order_line: OrderLine = create_order_line_helper()
+        shipping_info: ShippingInfo = create_shipping_info_helper()
+        order = Order([order_line], shipping_info)
+
+        name = 'new my name'
+        phone_number = 'new 01012341234'
+        address = 'new my address'
         new_shipping_info = ShippingInfo(name, phone_number, address)
 
         order.change_shipping_info(new_shipping_info)
@@ -45,11 +52,9 @@ class TestOrderChangeShippingInfo():
 
 class TestOrderChangeShipped():
     def test_change_shipped(self):
-        price = 5000
-        product = Product(price)
-        quantity = 3
-        order_lines = [OrderLine(product, quantity)]
-        order = Order(order_lines)
+        order_line: OrderLine = create_order_line_helper()
+        shipping_info: ShippingInfo = create_shipping_info_helper()
+        order = Order([order_line], shipping_info)
 
         order.change_shipped()
 
@@ -86,10 +91,27 @@ class TestOrderStateCanChangeShippingInfo():
 class TestOrderLineAmount():
     def test_amount(self):
         price = 5000
-        product = Product(price)
-        quantity = 5
-        order_line = OrderLine(product, quantity)
+        quantity = 3
+        order_line: OrderLine = create_order_line_helper(
+                price=price, quantity=quantity)
 
         amount: int = order_line.amount
 
         assert amount == price * quantity
+
+
+def create_order_line_helper(
+        price: int = 5000, quantity: int = 3,
+        ) -> OrderLine:
+    product = Product(price)
+    order_line = OrderLine(product, quantity)
+
+    return order_line
+
+
+def create_shipping_info_helper(
+        receiver_name: str = 'my name',
+        receiver_phone_number: str = '01012341234',
+        receiver_address: str = 'my address',
+        ) -> ShippingInfo:
+    return ShippingInfo(receiver_name, receiver_phone_number, receiver_address)
