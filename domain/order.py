@@ -1,6 +1,7 @@
 from __future__ import annotations
-
 import enum
+
+from .product import Product
 
 
 class Order():
@@ -48,6 +49,16 @@ class OrderState(enum.Enum):
             return True
 
         return False
+
+
+class OrderLine():
+    def __init__(self, product: Product, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+
+    @property
+    def amount(self):
+        return self.product.price * self.quantity
 
 
 class ShippingInfo():

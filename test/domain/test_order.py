@@ -1,4 +1,5 @@
-from domain.order import Order, OrderState, ShippingInfo
+from domain.order import Order, OrderState, OrderLine, ShippingInfo
+from domain.product import Product
 
 
 class TestOrderChangeShippingInfo():
@@ -45,3 +46,15 @@ class TestOrderStateCanChangeShippingInfo():
 
         state = OrderState.DELIVERY_COMPLETE
         assert state.can_change_shipping_info() is False
+
+
+class TestOrderLineAmount():
+    def test_amount(self):
+        price = 5000
+        product = Product(price)
+        quantity = 5
+        order_line = OrderLine(product, quantity)
+
+        amount = order_line.amount
+
+        assert amount == price * quantity
