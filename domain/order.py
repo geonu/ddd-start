@@ -33,12 +33,12 @@ class Order():
         return sum(line.amount for line in self.order_lines)
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
-        self.validate_shipping_info(shipping_info)
-
-        if not self.state.can_change_shipping_info():
+        if not self.state.is_before_shipped():
             raise ValueError(
-                    f'cannot change shipping info in {self.state} order state')
+                    f'cannot change shipping info because the state\
+                    {self.state} is not before shipped')
 
+        self.validate_shipping_info(shipping_info)
         self.shipping_info = shipping_info
 
     def change_shipped(self) -> None:
@@ -48,7 +48,12 @@ class Order():
         pass
 
     def cancel(self) -> None:
-        pass
+        if not self.state.is_before_shipped():
+            raise ValueError(
+                    f'cannot cancel order because the state {self.state}\
+                    is not before shipped')
+
+        self.state = OrderState.CANCELED
 
 
 class OrderState(enum.Enum):
@@ -57,8 +62,9 @@ class OrderState(enum.Enum):
     SHIPPED = enum.auto()
     DELIVERING = enum.auto()
     DELIVERY_COMPLETE = enum.auto()
+    CANCELED = enum.auto()
 
-    def can_change_shipping_info(self) -> bool:
+    def is_before_shipped(self) -> bool:
         if self in (self.PAYMENT_WAITING, self.PREPARING):
             return True
 

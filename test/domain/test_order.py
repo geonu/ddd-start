@@ -66,26 +66,35 @@ class TestOrderPayment():
 
 
 class TestOrderCancel():
-    pass
+    def test_cancel(self):
+        order_line: OrderLine = create_order_line_helper()
+        shipping_info: ShippingInfo = create_shipping_info_helper()
+        order = Order([order_line], shipping_info)
+
+        order.cancel()
+
+        assert order.state is OrderState.CANCELED
 
 
 class TestOrderStateCanChangeShippingInfo():
-    def test_can_change_shipping_info(self):
+    def test_is_before_shipped(self):
         state = OrderState.PAYMENT_WAITING
-        assert state.can_change_shipping_info() is True
+
+        assert state.is_before_shipped() is True
 
         state = OrderState.PREPARING
-        assert state.can_change_shipping_info() is True
+        assert state.is_before_shipped() is True
 
-    def test_cannot_change_shipping_info(self):
+    def test_is_not_before_shipped(self):
         state = OrderState.SHIPPED
-        assert state.can_change_shipping_info() is False
+
+        assert state.is_before_shipped() is False
 
         state = OrderState.DELIVERING
-        assert state.can_change_shipping_info() is False
+        assert state.is_before_shipped() is False
 
         state = OrderState.DELIVERY_COMPLETE
-        assert state.can_change_shipping_info() is False
+        assert state.is_before_shipped() is False
 
 
 class TestOrderLineAmount():
