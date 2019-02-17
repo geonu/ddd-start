@@ -1,10 +1,38 @@
+import pytest
+
 from domain.order import Order, OrderState, OrderLine, ShippingInfo
 from domain.product import Product
 
 
+class TestOrderValidateOrderLines():
+    def test_validate_order_lines(self):
+        order_lines = []
+
+        with pytest.raises(ValueError):
+            Order(order_lines)
+
+
+class TestOrderTotalAmount():
+    def test_total_amount(self):
+        price = 5000
+        product = Product(price)
+        quantity = 3
+        order_lines = [OrderLine(product, quantity),
+                       OrderLine(product, quantity)]
+        order = Order(order_lines)
+
+        total_amount: int = order.total_amount
+
+        assert total_amount == sum(line.amount for line in order_lines)
+
+
 class TestOrderChangeShippingInfo():
     def test_change_shipping_info(self):
-        order = Order()
+        price = 5000
+        product = Product(price)
+        quantity = 3
+        order_lines = [OrderLine(product, quantity)]
+        order = Order(order_lines)
         new_shipping_info = ShippingInfo()
 
         order.change_shipping_info(new_shipping_info)
@@ -14,7 +42,11 @@ class TestOrderChangeShippingInfo():
 
 class TestOrderChangeShipped():
     def test_change_shipped(self):
-        order = Order()
+        price = 5000
+        product = Product(price)
+        quantity = 3
+        order_lines = [OrderLine(product, quantity)]
+        order = Order(order_lines)
 
         order.change_shipped()
 
@@ -55,6 +87,6 @@ class TestOrderLineAmount():
         quantity = 5
         order_line = OrderLine(product, quantity)
 
-        amount = order_line.amount
+        amount: int = order_line.amount
 
         assert amount == price * quantity

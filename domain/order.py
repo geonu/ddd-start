@@ -1,18 +1,31 @@
 from __future__ import annotations
 import enum
+from typing import List
 
 from .product import Product
 
 
 class Order():
     def __init__(
-            self, state: OrderState=None, shipping_info: ShippingInfo=None,
+            self, order_lines: List[OrderLine], state: OrderState=None,
+            shipping_info: ShippingInfo=None,
             ) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
 
+        self.validate_order_lines(order_lines)
+
+        self.order_lines = order_lines
         self.state = state
         self.shipping_info = shipping_info
+
+    def validate_order_lines(self, order_lines):
+        if len(order_lines) == 0:
+            raise ValueError('Order must have more than one OrderLine')
+
+    @property
+    def total_amount(self) -> int:
+        return sum(line.amount for line in self.order_lines)
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if not self.state.can_change_shipping_info():
@@ -38,13 +51,13 @@ class OrderState(enum.Enum):
     DELIVERING = enum.auto()
     DELIVERY_COMPLETE = enum.auto()
 
-    def can_change_shipping_info(self):
+    def can_change_shipping_info(self) -> bool:
         if self in (self.PAYMENT_WAITING, self.PREPARING):
             return True
 
         return False
 
-    def can_cancel_order(self):
+    def can_cancel_order(self) -> bool:
         if self in (self.PAYMENT_WAITING, self.PREPARING, self.SHIPPED):
             return True
 
@@ -57,7 +70,7 @@ class OrderLine():
         self.quantity = quantity
 
     @property
-    def amount(self):
+    def amount(self) -> int:
         return self.product.price * self.quantity
 
 
