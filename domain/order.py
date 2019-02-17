@@ -30,10 +30,11 @@ class Order():
 
     @property
     def total_amount(self) -> Money:
-        _total_amount: int = sum(
-                line.amount.value for line in self.order_lines)
+        _total_amount = Money(0)
+        for line in self.order_lines:
+            _total_amount += line.amount
 
-        return Money(_total_amount)
+        return _total_amount
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if not self.state.is_before_shipped():
@@ -87,9 +88,9 @@ class OrderLine():
 
     @property
     def amount(self) -> Money:
-        _price: int = self.product.price.value
+        price: Money = self.product.price
 
-        return Money(_price * self.quantity)
+        return price * self.quantity
 
 
 class ShippingInfo():

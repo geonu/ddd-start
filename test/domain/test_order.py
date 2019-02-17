@@ -33,8 +33,11 @@ class TestOrderTotalAmount():
 
         total_amount: Money = order.total_amount
 
-        assert total_amount.value == sum(
-                line.amount.value for line in order_lines)
+        _total_amount = Money(0)
+        for line in order_lines:
+            _total_amount += line.amount
+
+        assert total_amount == _total_amount
 
 
 class TestOrderChangeShippingInfo():
@@ -112,7 +115,7 @@ class TestOrderLineAmount():
 
         amount: Money = order_line.amount
 
-        assert amount.value == price.value * quantity
+        assert amount == price * quantity
 
 
 def create_order_line_helper(
