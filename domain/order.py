@@ -7,8 +7,8 @@ from .product import Product
 
 class Order():
     def __init__(
-            self, order_lines: List[OrderLine], state: OrderState=None,
-            shipping_info: ShippingInfo=None,
+            self, order_lines: List[OrderLine], state: OrderState = None,
+            shipping_info: ShippingInfo = None,
             ) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
@@ -19,7 +19,7 @@ class Order():
         self.state = state
         self.shipping_info = shipping_info
 
-    def validate_order_lines(self, order_lines):
+    def validate_order_lines(self, order_lines) -> None:
         if len(order_lines) == 0:
             raise ValueError('Order must have more than one OrderLine')
 
@@ -75,4 +75,10 @@ class OrderLine():
 
 
 class ShippingInfo():
-    pass
+    def __init__(
+            self, receiver_name: str, receiver_phone_number: str,
+            receiver_address: str,
+            ) -> None:
+        self.receiver_name = receiver_name
+        self.receiver_phone_number = receiver_phone_number
+        self.receiver_address = receiver_address

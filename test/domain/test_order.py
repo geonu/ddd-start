@@ -33,7 +33,10 @@ class TestOrderChangeShippingInfo():
         quantity = 3
         order_lines = [OrderLine(product, quantity)]
         order = Order(order_lines)
-        new_shipping_info = ShippingInfo()
+        name = 'my name'
+        phone_number = '01012341234'
+        address = 'my address'
+        new_shipping_info = ShippingInfo(name, phone_number, address)
 
         order.change_shipping_info(new_shipping_info)
 
