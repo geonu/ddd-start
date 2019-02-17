@@ -1,6 +1,8 @@
 import pytest
 
-from domain.order import Order, OrderState, OrderLine, ShippingInfo
+from domain.order import (
+        Order, OrderState, OrderLine, ShippingInfo, Receiver, Address,
+)
 from domain.product import Product
 
 
@@ -42,8 +44,11 @@ class TestOrderChangeShippingInfo():
 
         name = 'new my name'
         phone_number = 'new 01012341234'
-        address = 'new my address'
-        new_shipping_info = ShippingInfo(name, phone_number, address)
+        address1 = 'new my address 1'
+        address2 = 'new my address 1'
+        zipcode = 'new my address 1'
+        new_shipping_info = create_shipping_info_helper(
+                name, phone_number, address1, address2, zipcode)
 
         order.change_shipping_info(new_shipping_info)
 
@@ -119,8 +124,13 @@ def create_order_line_helper(
 
 
 def create_shipping_info_helper(
-        receiver_name: str = 'my name',
-        receiver_phone_number: str = '01012341234',
-        receiver_address: str = 'my address',
+        name: str = 'my name',
+        phone_number: str = '01012341234',
+        address1: str = 'my address 1',
+        address2: str = 'my address 2',
+        zipcode: str = 'my zipcode',
         ) -> ShippingInfo:
-    return ShippingInfo(receiver_name, receiver_phone_number, receiver_address)
+
+    receiver = Receiver(name, phone_number)
+    address = Address(address1, address2, zipcode)
+    return ShippingInfo(receiver, address)

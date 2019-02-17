@@ -89,9 +89,19 @@ class OrderLine():
 
 class ShippingInfo():
     def __init__(
-            self, receiver_name: str, receiver_phone_number: str,
-            receiver_address: str,
-            ) -> None:
-        self.receiver_name = receiver_name
-        self.receiver_phone_number = receiver_phone_number
-        self.receiver_address = receiver_address
+            self, receiver: Receiver, address: Address) -> None:
+        self.receiver = receiver
+        self.address = address
+
+
+class Receiver():
+    def __init__(self, name: str, phone_number: str) -> None:
+        self.name = name
+        self.phone_number = phone_number
+
+
+class Address():
+    def __init__(self, address1: str, address2: str, zipcode: str) -> None:
+        self.address1 = address1
+        self.address2 = address2
+        self.zipcode = zipcode
