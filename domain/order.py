@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 from typing import List
 
-from .product import Product
+from .product import Product, Money
 
 
 class Order():
@@ -29,8 +29,11 @@ class Order():
             raise ValueError('Order must have not None ShippingInfo')
 
     @property
-    def total_amount(self) -> int:
-        return sum(line.amount for line in self.order_lines)
+    def total_amount(self) -> Money:
+        _total_amount: int = sum(
+                line.amount.value for line in self.order_lines)
+
+        return Money(_total_amount)
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if not self.state.is_before_shipped():
@@ -83,8 +86,10 @@ class OrderLine():
         self.quantity = quantity
 
     @property
-    def amount(self) -> int:
-        return self.product.price * self.quantity
+    def amount(self) -> Money:
+        _price: int = self.product.price.value
+
+        return Money(_price * self.quantity)
 
 
 class ShippingInfo():

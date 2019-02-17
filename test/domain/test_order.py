@@ -3,7 +3,7 @@ import pytest
 from domain.order import (
         Order, OrderState, OrderLine, ShippingInfo, Receiver, Address,
 )
-from domain.product import Product
+from domain.product import Product, Money
 
 
 class TestOrderValidateOrderLines():
@@ -31,9 +31,10 @@ class TestOrderTotalAmount():
         shipping_info: ShippingInfo = create_shipping_info_helper()
         order = Order(order_lines, shipping_info)
 
-        total_amount: int = order.total_amount
+        total_amount: Money = order.total_amount
 
-        assert total_amount == sum(line.amount for line in order_lines)
+        assert total_amount.value == sum(
+                line.amount.value for line in order_lines)
 
 
 class TestOrderChangeShippingInfo():
@@ -104,19 +105,21 @@ class TestOrderStateCanChangeShippingInfo():
 
 class TestOrderLineAmount():
     def test_amount(self):
-        price = 5000
+        price = Money(5000)
         quantity = 3
         order_line: OrderLine = create_order_line_helper(
                 price=price, quantity=quantity)
 
-        amount: int = order_line.amount
+        amount: Money = order_line.amount
 
-        assert amount == price * quantity
+        assert amount.value == price.value * quantity
 
 
 def create_order_line_helper(
-        price: int = 5000, quantity: int = 3,
+        price: Money = None, quantity: int = 3,
         ) -> OrderLine:
+    if not price:
+        price = Money(5000)
     product = Product(price)
     order_line = OrderLine(product, quantity)
 
@@ -133,4 +136,5 @@ def create_shipping_info_helper(
 
     receiver = Receiver(name, phone_number)
     address = Address(address1, address2, zipcode)
+
     return ShippingInfo(receiver, address)
