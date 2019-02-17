@@ -20,6 +20,14 @@ class TestOrderChangeShipped():
         assert order.state is OrderState.SHIPPED
 
 
+class TestOrderPayment():
+    pass
+
+
+class TestOrderCancel():
+    pass
+
+
 class TestOrderStateCanChangeShippingInfo():
     def test_can_change_shipping_info(self):
         state = OrderState.PAYMENT_WAITING

@@ -13,15 +13,21 @@ class Order():
         self.state = state
         self.shipping_info = shipping_info
 
-    def change_shipping_info(self, shipping_info: ShippingInfo):
+    def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if not self.state.can_change_shipping_info():
             raise ValueError(
                     f'cannot change shipping info in {self.state} order state')
 
         self.shipping_info = shipping_info
 
-    def change_shipped(self):
+    def change_shipped(self) -> None:
         self.state = OrderState.SHIPPED
+
+    def payment(self) -> None:
+        pass
+
+    def cancel(self) -> None:
+        pass
 
 
 class OrderState(enum.Enum):
