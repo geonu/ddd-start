@@ -19,29 +19,33 @@ class Order():
         if not state:
             state = OrderState.PAYMENT_WAITING
 
-        self.validate_order_lines(order_lines)
-        self.validate_shipping_info(shipping_info)
-
         self._order_no = OrderNo()
+        self._set_order_lines(order_lines)
+        self._set_shipping_info(shipping_info)
+        self._set_state(state)
+
+    def _set_order_lines(self, order_lines: List[OrderLine]) -> None:
+        if len(order_lines) == 0:
+            raise ValueError('Order must have more than one OrderLine')
+
         self._order_lines = order_lines
-        self._shipping_info = shipping_info
-        self._state = state
 
     @property
     def state(self) -> OrderState:
         return self._state
 
+    def _set_state(self, state: OrderState) -> None:
+        self._state = state
+
     @property
     def shipping_info(self) -> ShippingInfo:
         return self._shipping_info
 
-    def validate_order_lines(self, order_lines: List[OrderLine]) -> None:
-        if len(order_lines) == 0:
-            raise ValueError('Order must have more than one OrderLine')
-
-    def validate_shipping_info(self, shipping_info: ShippingInfo) -> None:
+    def _set_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if shipping_info is None:
             raise ValueError('Order must have not None ShippingInfo')
+
+        self._shipping_info = shipping_info
 
     @property
     def total_amount(self) -> Money:
@@ -57,11 +61,10 @@ class Order():
                     f'cannot change shipping info because the state\
                     {self.state} is not before shipped')
 
-        self.validate_shipping_info(shipping_info)
-        self._shipping_info = shipping_info
+        self._set_shipping_info(shipping_info)
 
     def change_shipped(self) -> None:
-        self._state = OrderState.SHIPPED
+        self._set_state(OrderState.SHIPPED)
 
     def payment(self) -> None:
         pass
@@ -72,7 +75,7 @@ class Order():
                     f'cannot cancel order because the state {self.state}\
                     is not before shipped')
 
-        self._state = OrderState.CANCELED
+        self._set_state(OrderState.CANCELED)
 
 
 @dataclass
