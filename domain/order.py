@@ -93,21 +93,20 @@ class OrderLine():
         return price * self.quantity
 
 
+@dataclass
 class ShippingInfo():
-    def __init__(
-            self, receiver: Receiver, address: Address) -> None:
-        self.receiver = receiver
-        self.address = address
+    receiver: Receiver
+    address: Address
 
 
+@dataclass
 class Receiver():
-    def __init__(self, name: str, phone_number: str) -> None:
-        self.name = name
-        self.phone_number = phone_number
+    name: str
+    phone_number: str
 
 
+@dataclass
 class Address():
-    def __init__(self, address1: str, address2: str, zipcode: str) -> None:
-        self.address1 = address1
-        self.address2 = address2
-        self.zipcode = zipcode
+    address1: str
+    address2: str
+    zipcode: str
