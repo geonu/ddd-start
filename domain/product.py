@@ -9,18 +9,14 @@ class Product():
 
 @dataclass
 class Money():
-    _value: int
-
-    @property
-    def value(self):
-        return self._value
+    value: int
 
     def __add__(self, other: Money) -> Money:
-        return Money(self._value + other.value)
+        return Money(self.value + other.value)
 
     __radd__ = __add__
 
     def __mul__(self, quantity: int) -> Money:
-        return Money(self._value * quantity)
+        return Money(self.value * quantity)
 
     __rmul__ = __mul__

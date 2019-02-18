@@ -1,11 +1,17 @@
 from __future__ import annotations
-import enum
+from dataclasses import dataclass
+from enum import Enum, auto
 from typing import List
 
 from .product import Product, Money
 
 
 class Order():
+    order_no: OrderNo
+    order_lines: List[OrderLine]
+    shipping_info: ShippingInfo
+    state: OrderState
+
     def __init__(
             self, order_lines: List[OrderLine], shipping_info: ShippingInfo,
             state: OrderState = None,
@@ -16,6 +22,7 @@ class Order():
         self.validate_order_lines(order_lines)
         self.validate_shipping_info(shipping_info)
 
+        self.order_no = OrderNo()
         self.order_lines = order_lines
         self.shipping_info = shipping_info
         self.state = state
@@ -60,13 +67,18 @@ class Order():
         self.state = OrderState.CANCELED
 
 
-class OrderState(enum.Enum):
-    PAYMENT_WAITING = enum.auto()
-    PREPARING = enum.auto()
-    SHIPPED = enum.auto()
-    DELIVERING = enum.auto()
-    DELIVERY_COMPLETE = enum.auto()
-    CANCELED = enum.auto()
+@dataclass
+def OrderNo():
+    no: str
+
+
+class OrderState(Enum):
+    PAYMENT_WAITING = auto()
+    PREPARING = auto()
+    SHIPPED = auto()
+    DELIVERING = auto()
+    DELIVERY_COMPLETE = auto()
+    CANCELED = auto()
 
     def is_before_shipped(self) -> bool:
         if self in (self.PAYMENT_WAITING, self.PREPARING):
@@ -82,6 +94,9 @@ class OrderState(enum.Enum):
 
 
 class OrderLine():
+    product: Product
+    quantity: int
+
     def __init__(self, product: Product, quantity: int) -> None:
         self.product = product
         self.quantity = quantity
