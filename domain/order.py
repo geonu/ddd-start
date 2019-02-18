@@ -7,10 +7,10 @@ from .product import Product, Money
 
 
 class Order():
-    order_no: OrderNo
-    order_lines: List[OrderLine]
-    shipping_info: ShippingInfo
-    state: OrderState
+    _order_no: OrderNo
+    _order_lines: List[OrderLine]
+    _shipping_info: ShippingInfo
+    _state: OrderState
 
     def __init__(
             self, order_lines: List[OrderLine], shipping_info: ShippingInfo,
@@ -22,10 +22,18 @@ class Order():
         self.validate_order_lines(order_lines)
         self.validate_shipping_info(shipping_info)
 
-        self.order_no = OrderNo()
-        self.order_lines = order_lines
-        self.shipping_info = shipping_info
-        self.state = state
+        self._order_no = OrderNo()
+        self._order_lines = order_lines
+        self._shipping_info = shipping_info
+        self._state = state
+
+    @property
+    def state(self) -> OrderState:
+        return self._state
+
+    @property
+    def shipping_info(self) -> ShippingInfo:
+        return self._shipping_info
 
     def validate_order_lines(self, order_lines: List[OrderLine]) -> None:
         if len(order_lines) == 0:
@@ -38,38 +46,41 @@ class Order():
     @property
     def total_amount(self) -> Money:
         _total_amount = Money(0)
-        for line in self.order_lines:
+        for line in self._order_lines:
             _total_amount += line.amount
 
         return _total_amount
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
-        if not self.state.is_before_shipped():
+        if not self._state.is_before_shipped():
             raise ValueError(
                     f'cannot change shipping info because the state\
                     {self.state} is not before shipped')
 
         self.validate_shipping_info(shipping_info)
-        self.shipping_info = shipping_info
+        self._shipping_info = shipping_info
 
     def change_shipped(self) -> None:
-        self.state = OrderState.SHIPPED
+        self._state = OrderState.SHIPPED
 
     def payment(self) -> None:
         pass
 
     def cancel(self) -> None:
-        if not self.state.is_before_shipped():
+        if not self._state.is_before_shipped():
             raise ValueError(
                     f'cannot cancel order because the state {self.state}\
                     is not before shipped')
 
-        self.state = OrderState.CANCELED
+        self._state = OrderState.CANCELED
 
 
 @dataclass
-def OrderNo():
-    no: str
+class OrderNo():
+    _no: str
+
+    def __init__(self) -> None:
+        pass
 
 
 class OrderState(Enum):
@@ -86,42 +97,36 @@ class OrderState(Enum):
 
         return False
 
-    def can_cancel_order(self) -> bool:
-        if self in (self.PAYMENT_WAITING, self.PREPARING, self.SHIPPED):
-            return True
-
-        return False
-
 
 class OrderLine():
-    product: Product
-    quantity: int
+    _product: Product
+    _quantity: int
 
     def __init__(self, product: Product, quantity: int) -> None:
-        self.product = product
-        self.quantity = quantity
+        self._product = product
+        self._quantity = quantity
 
     @property
     def amount(self) -> Money:
-        price: Money = self.product.price
+        price: Money = self._product.price
 
-        return price * self.quantity
+        return price * self._quantity
 
 
 @dataclass
 class ShippingInfo():
-    receiver: Receiver
-    address: Address
+    _receiver: Receiver
+    _address: Address
 
 
 @dataclass
 class Receiver():
-    name: str
-    phone_number: str
+    _name: str
+    _phone_number: str
 
 
 @dataclass
 class Address():
-    address1: str
-    address2: str
-    zipcode: str
+    _address1: str
+    _address2: str
+    _zipcode: str
