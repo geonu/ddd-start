@@ -2,15 +2,21 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from domain.customer import Customer
-from domain.order import Order, OrderLine
+from domain.order import Order, OrderNo, OrderLine
 from domain.product import Money
+from domain.repository.order import OrderRepository
 
 
 class OrderCancel():
-    def order_cancel(self, order_id: str) -> None:
-        order: Order = self.find_by_order_id(order_id)
+    _order_repository: OrderRepository
+
+    def __init__(self, order_repository: OrderRepository) -> None:
+        self._order_repository = order_repository
+
+    def cancel(self, order_no: OrderNo) -> None:
+        order: Order = self._order_repository.find_by_no(order_no)
         if not order:
-            raise ValueError(f'no order {order_id}')
+            raise ValueError(f'no order {order_no}')
 
         order.cancel()
 
