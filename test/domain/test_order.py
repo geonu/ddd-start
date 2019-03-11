@@ -31,7 +31,7 @@ class TestOrderTotalAmount():
         shipping_info: ShippingInfo = create_shipping_info_helper()
         order = Order(order_lines, shipping_info)
 
-        total_amount: Money = order.total_amount
+        total_amount: Money = order.total_amount()
 
         _total_amount = Money(0)
         for line in order_lines:
