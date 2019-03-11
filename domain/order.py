@@ -14,18 +14,17 @@ class Order():
 
     def __init__(
             self, order_lines: List[OrderLine], shipping_info: ShippingInfo,
-            state: OrderState = None,
-            ) -> None:
+            state: OrderState = None) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
 
         self._order_no = OrderNo()
+        self._state = state
         self._set_order_lines(order_lines)
-        self._set_shipping_info(shipping_info)
-        self._set_state(state)
+        self.change_shipping_info(shipping_info)
 
     def _set_order_lines(self, order_lines: List[OrderLine]) -> None:
-        if len(order_lines) == 0:
+        if not order_lines:
             raise ValueError('Order must have more than one OrderLine')
 
         self._order_lines = order_lines
@@ -34,18 +33,18 @@ class Order():
     def state(self) -> OrderState:
         return self._state
 
-    def _set_state(self, state: OrderState) -> None:
-        self._state = state
-
     @property
     def shipping_info(self) -> ShippingInfo:
         return self._shipping_info
 
-    def _set_shipping_info(self, shipping_info: ShippingInfo) -> None:
+    def _validate_shipping_info(self, shipping_info: ShippingInfo) -> None:
         if shipping_info is None:
             raise ValueError('Order must have not None ShippingInfo')
 
-        self._shipping_info = shipping_info
+        if not self._state.is_before_shipped():
+            raise ValueError(
+                f'cannot change shipping info because the state\
+                {self.state} is not before shipped')
 
     @property
     def total_amount(self) -> Money:
@@ -56,15 +55,11 @@ class Order():
         return _total_amount
 
     def change_shipping_info(self, shipping_info: ShippingInfo) -> None:
-        if not self._state.is_before_shipped():
-            raise ValueError(
-                    f'cannot change shipping info because the state\
-                    {self.state} is not before shipped')
-
-        self._set_shipping_info(shipping_info)
+        self._validate_shipping_info(shipping_info)
+        self._shipping_info = shipping_info
 
     def change_shipped(self) -> None:
-        self._set_state(OrderState.SHIPPED)
+        self._state = OrderState.SHIPPED
 
     def payment(self) -> None:
         pass
@@ -72,10 +67,10 @@ class Order():
     def cancel(self) -> None:
         if not self._state.is_before_shipped():
             raise ValueError(
-                    f'cannot cancel order because the state {self.state}\
-                    is not before shipped')
+                f'cannot cancel order because the state {self.state}\
+                is not before shipped')
 
-        self._set_state(OrderState.CANCELED)
+        self._state = OrderState.CANCELED
 
 
 @dataclass
