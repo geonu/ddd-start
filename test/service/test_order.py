@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 from service.order import CalculateDiscount
-from domain.customer import Customer
+from domain.member import Customer
 from domain.product import Money
 
 from test.domain.test_order import create_order_line_helper

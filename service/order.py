@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from domain.customer import Customer
+from domain.member import Customer
 from domain.order import Order, OrderId, OrderLine
 from domain.product import Money
 from domain.repository.order import OrderRepository

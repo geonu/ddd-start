@@ -11,7 +11,3 @@ class OrderRepository(ABC):
     @abstractmethod
     def save(self, order: Order) -> None:
         pass
-
-    @abstractmethod
-    def delete(self, order: Order) -> None:
-        pass

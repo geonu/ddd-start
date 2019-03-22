@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List
 
-from .product import Product, Money
+from domain.member import MemberId
+from domain.product import Product, Money
 
 
 class Order():
@@ -18,7 +19,7 @@ class Order():
         if not state:
             state = OrderState.PAYMENT_WAITING
 
-        self._order_id= OrderId()
+        self._order_id = OrderId()
         self._state = state
         self._order_lines = OrderLines(order_lines)
         self.change_shipping_info(shipping_info)
@@ -69,8 +70,11 @@ class Order():
 class OrderId():
     _id: str
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, _id: str = None) -> None:
+        if _id is None:
+            _id = 'uuid'
+
+        self._id = _id
 
 
 class OrderState(Enum):
@@ -124,6 +128,10 @@ class OrderLine:
         price: Money = self._product.price
 
         return price * self._quantity
+
+
+class Orderer:
+    _member_id: MemberId
 
 
 @dataclass
