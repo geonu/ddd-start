@@ -1,6 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import (
+    Column, Integer, String, DateTime, ForeignKey,
+)
+from sqlalchemy.orm import relationship
 
 from domain.order import Order, OrderId
 from domain.repository.order import OrderRepository
@@ -28,6 +31,22 @@ class OrderDAO(Base):
     shipping_address2 = Column(String)
     receiver_name = Column(String)
     receiver_phone = Column(String)
+
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(
+        DateTime, nullable=False, default=datetime.now,
+        onupdate=datetime.now)
+
+    order_lines = relationship('OrderLineDAO')
+
+
+class OrderLineDAO(Base):
+    __tablename__ = 'order_line'
+
+    order_id = Column(
+        String, ForeignKey('order.id'), primary_key=True, nullable=False)
+    product_id = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False)
 
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(
