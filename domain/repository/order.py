@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from domain.order import Order, OrderNo
+from domain.order import Order, OrderId
 
 
 class OrderRepository(ABC):
     @abstractmethod
-    def find_by_no(self, order_no: OrderNo) -> Order:
+    def find_by_id(self, order_id: OrderId) -> Order:
         pass
 
     @abstractmethod

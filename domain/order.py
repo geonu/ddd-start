@@ -7,7 +7,7 @@ from .product import Product, Money
 
 
 class Order():
-    _order_no: OrderNo
+    _order_id: OrderId
     _order_lines: OrderLines
     _shipping_info: ShippingInfo
     _state: OrderState
@@ -18,7 +18,7 @@ class Order():
         if not state:
             state = OrderState.PAYMENT_WAITING
 
-        self._order_no = OrderNo()
+        self._order_id= OrderId()
         self._state = state
         self._order_lines = OrderLines(order_lines)
         self.change_shipping_info(shipping_info)
@@ -66,8 +66,8 @@ class Order():
 
 
 @dataclass
-class OrderNo():
-    _no: str
+class OrderId():
+    _id: str
 
     def __init__(self) -> None:
         pass
