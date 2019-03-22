@@ -14,12 +14,15 @@ class Order():
     _state: OrderState
 
     def __init__(
-            self, order_lines: List[OrderLine], shipping_info: ShippingInfo,
+            self, order_id: OrderId = None, order_lines: List[OrderLine], shipping_info: ShippingInfo,
             state: OrderState = None) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
 
-        self._order_id = OrderId()
+        if order_id is None:
+            order_id = OrderId()
+
+        self._order_id = order_id
         self._state = state
         self._order_lines = OrderLines(order_lines)
         self.change_shipping_info(shipping_info)
@@ -75,6 +78,10 @@ class OrderId():
             _id = 'uuid'
 
         self._id = _id
+
+    @property
+    def id(self) -> str:
+        return self._id
 
 
 class OrderState(Enum):
