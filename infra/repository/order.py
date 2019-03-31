@@ -1,11 +1,15 @@
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import (
     Column, Integer, String, DateTime, ForeignKey,
 )
 from sqlalchemy.orm import relationship, joinedload
 
-from domain.order import Order, OrderId, Receiver, Address
+from domain.order import (
+    Order, OrderId, OrderLines, OrderLine, ShippingInfo, Receiver, Address,
+)
+from domain.product import Product, Money
 from domain.repository.order import OrderRepository
 
 from infra.sqlalchemy import Base, tx
@@ -14,22 +18,34 @@ from infra.sqlalchemy import Base, tx
 class SAOrderRespository(OrderRepository):
     def find_by_id(self, order_id: OrderId) -> Order:
         with tx() as session:
-            order: OrderDAO = session.query(OrderDAO).options(
+            dao: OrderDAO = session.query(OrderDAO).options(
                 joinedload(OrderDAO.order_lines),
             ).filter(
                 OrderDAO.id == order_id.id,
             ).first()
 
-            order_id = OrderId(order.id)
-            receiver = Receiver(order.receiver_name, order.receiver_phone)
-            address = Address(
-                order.shipping_address1, order.shipping_address2,
-                order.shipping_zipcode)
-
-            return Order(order.order_lines, receiver, address)
+            return dao.to_order()
 
     def save(self, order: Order) -> None:
-        pass
+        with tx() as session:
+            dao: OrderDAO = session.query(OrderDAO).filter(
+                OrderDAO.id == order.id.id,
+            ).first()
+
+            dao.receiver_name = order.shipping_info._receiver._name
+            dao.receiver_phone = order.shipping_info._receiver._phone_number
+            dao.shipping_zipcode = order.shipping_info._address._zipcode
+            dao.shipping_address1 = order.shipping_info._address._address1
+            dao.shipping_address2 = order.shipping_info._address._address2
+
+            dao.state = order.state
+
+            line_daos: List[OrderLineDAO] = []
+            for line in order._order_lines._lines:
+                line_dao = OrderLineDAO(line.product._id, line.quantity)
+                line_daos.append(line_dao)
+
+            dao.order_lines = line_daos
 
 
 class OrderDAO(Base):
@@ -52,6 +68,19 @@ class OrderDAO(Base):
 
     order_lines = relationship('OrderLineDAO')
 
+    def to_order(self) -> Order:
+        order_id = OrderId(self.id)
+        receiver = Receiver(self.receiver_name, self.receiver_phone)
+        address = Address(
+            self.shipping_address1, self.shipping_address2,
+            self.shipping_zipcode)
+        shipping_info = ShippingInfo(receiver, address)
+        order_lines: OrderLines = OrderLines(
+            [line.to_order_line() for line in self.order_lines])
+
+        return Order(
+            order_id, order_lines, shipping_info, self.state)
+
 
 class OrderLineDAO(Base):
     __tablename__ = 'order_line'
@@ -65,3 +94,9 @@ class OrderLineDAO(Base):
     updated_at = Column(
         DateTime, nullable=False, default=datetime.now,
         onupdate=datetime.now)
+
+    def to_order_line(self) -> OrderLine:
+        product = Product(Money(100))  # hard coded
+        quantity: int = self.quantity
+
+        return OrderLine(product, quantity)

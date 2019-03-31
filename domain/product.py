@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 
 class Product():
+    _id: str
     _price: Money
 
     def __init__(self, price: Money) -> None:
