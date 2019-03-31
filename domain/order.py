@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum, auto
 from typing import List
 
@@ -14,13 +15,10 @@ class Order():
     _state: OrderState
 
     def __init__(
-            self, order_id: OrderId = None, order_lines: List[OrderLine], shipping_info: ShippingInfo,
-            state: OrderState = None) -> None:
+            self, order_id: OrderId, order_lines: List[OrderLine],
+            shipping_info: ShippingInfo, state: OrderState = None) -> None:
         if not state:
             state = OrderState.PAYMENT_WAITING
-
-        if order_id is None:
-            order_id = OrderId()
 
         self._order_id = order_id
         self._state = state
@@ -82,6 +80,12 @@ class OrderId():
     @property
     def id(self) -> str:
         return self._id
+
+    def create(self, user_id: MemberId) -> OrderId:
+        if user_id is None:
+            raise ValueError('user_id is required')
+
+        return OrderId(_id=f'{MemberId.id}-{datetime.now()}')
 
 
 class OrderState(Enum):
